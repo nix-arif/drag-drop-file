@@ -4,10 +4,15 @@ import {
   AiOutlineFilePdf,
   AiOutlineFileExcel,
 } from 'react-icons/ai';
+import { useDispatch } from 'react-redux';
+import { excelFile } from '../redux/features/quoteFileSlice';
 
 const Dashboard = () => {
   const [dragActive, setDragActive] = useState(false);
   const [fileInfo, setFileInfo] = useState({});
+  const [file, setFile] = useState({});
+
+  const dispatch = useDispatch();
 
   const inputRef = useRef(null);
 
@@ -16,10 +21,10 @@ const Dashboard = () => {
     e.stopPropagation();
     if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
-      console.log(e.type);
+      // console.log(e.type);
     } else if (e.type === 'dragleave') {
       setDragActive(false);
-      console.log(e.type);
+      // console.log(e.type);
     }
   };
 
@@ -31,9 +36,10 @@ const Dashboard = () => {
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       // at least one file has been dropped so do something
       const { name, type } = e.dataTransfer.files[0];
-      console.log(name);
-      console.log(type);
+      // console.log(name);
+      // console.log(type);
       setFileInfo({ name, type });
+      setFile(e.dataTransfer.files[0]);
     }
   };
 
@@ -50,6 +56,9 @@ const Dashboard = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (file !== {}) {
+      dispatch(excelFile(file));
+    }
   };
 
   return (

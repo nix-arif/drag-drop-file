@@ -26,4 +26,4 @@ const quoteFileSlice = createSlice({
   },
 });
 
-export default quoteFileSlice;
+export default quoteFileSlice.reducer;

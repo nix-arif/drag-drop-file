@@ -1,18 +1,16 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   AiOutlineFileJpg,
   AiOutlineFilePdf,
   AiOutlineFileExcel,
 } from 'react-icons/ai';
-import { useDispatch } from 'react-redux';
-import { excelFile } from '../redux/features/quoteFileSlice';
+import uploadFilesService from '../services/uploadFilesService';
 
 const Dashboard = () => {
   const [dragActive, setDragActive] = useState(false);
-  const [fileInfo, setFileInfo] = useState({});
-  const [file, setFile] = useState({});
+  const [isUploaded, setIsUploaded] = useState(false);
 
-  const dispatch = useDispatch();
+  const [file, setFile] = useState({});
 
   const inputRef = useRef(null);
 
@@ -21,24 +19,17 @@ const Dashboard = () => {
     e.stopPropagation();
     if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
-      // console.log(e.type);
     } else if (e.type === 'dragleave') {
       setDragActive(false);
-      // console.log(e.type);
     }
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      // at least one file has been dropped so do something
-      const { name, type } = e.dataTransfer.files[0];
-      // console.log(name);
-      // console.log(type);
-      setFileInfo({ name, type });
       setFile(e.dataTransfer.files[0]);
     }
   };
@@ -54,16 +45,27 @@ const Dashboard = () => {
     inputRef.current.click();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (file !== {}) {
-      dispatch(excelFile(file));
+
+    if (file.type !== undefined) {
+      uploadFilesService
+        .upload(file)
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => console.log(err));
+      setFile({});
+      setIsUploaded(true);
     }
   };
+
+  useEffect(() => {}, [file]);
 
   return (
     <div className="m-3 text-xl text-gray-900 font-semibold">
       <h1 className="text-xl">Dashboard</h1>
+      {isUploaded && <h2>File is Uploaded</h2>}
       <form
         id="form-file-upload"
         className="h-[16rem] w-[28rem] max-w-full text-center relative"
@@ -85,21 +87,21 @@ const Dashboard = () => {
             dragActive ? 'bg-white' : ''
           }`}
         >
-          {fileInfo.name && fileInfo.type ? (
-            fileInfo.type === 'image/png' ? (
+          {file.name && file.type ? (
+            file.type === 'image/png' ? (
               <div className="flex flex-1 flex-col items-center">
                 <AiOutlineFileJpg size="46px" />
-                <p className="text-sm mt-2">{fileInfo.name}</p>
+                <p className="text-sm mt-2">{file.name}</p>
               </div>
-            ) : fileInfo.type === 'application/pdf' ? (
+            ) : file.type === 'application/pdf' ? (
               <div className="flex flex-1 flex-col items-center">
                 <AiOutlineFilePdf size="46px" />
-                <p className="text-sm mt-2">{fileInfo.name}</p>
+                <p className="text-sm mt-2">{file.name}</p>
               </div>
             ) : (
               <div className="flex flex-1 flex-col items-center">
                 <AiOutlineFileExcel size="46px" />
-                <p className="text-sm mt-2">{fileInfo.name}</p>
+                <p className="text-sm mt-2">{file.name}</p>
               </div>
             )
           ) : (

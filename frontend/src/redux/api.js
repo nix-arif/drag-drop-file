@@ -1,5 +1,8 @@
 import axios from 'axios';
 
-const API = axios.create({ baseURL: 'http://localhost:5000' });
-
-export const excelFile = (file) => API.post('/files/excelFile', file);
+export default axios.create({
+  baseURL: 'http://localhost:5000',
+  headers: {
+    'Content-type': 'application/json',
+  },
+});

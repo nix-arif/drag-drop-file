@@ -1,14 +1,16 @@
 const XLSX = require("xlsx");
 
 exports.convertJSON = function (file) {
-  try {
-    console.log(file);
-    const wb = XLSX.readFile(file);
-    const cell = wb.Sheets["Table 1"]["C3"].v;
-    return cell;
-  } catch (error) {
-    return error;
-  }
+  return new Promise(function (resolve, reject) {
+    try {
+      const wb = XLSX.readFile(file);
+      const ws = wb.Sheets[wb.SheetNames[1]];
+      const resultJSON = XLSX.utils.sheet_to_json(ws);
+      resolve(resultJSON);
+    } catch (error) {
+      reject(error);
+    }
+  });
 };
 
 // exports.isReadableStream = function (obj) {
